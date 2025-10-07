@@ -4,8 +4,14 @@ from app.routers import auth, dashboard
 from app.models.database import engine
 from app.models import user
 
-# Create database tables
-user.Base.metadata.create_all(bind=engine)
+# Create database tables (with error handling)
+try:
+    user.Base.metadata.create_all(bind=engine)
+    print("Database tables created successfully")
+except Exception as e:
+    print(f"Warning: Could not connect to database: {e}")
+    print("Application will start without database initialization")
+    print("Make sure DATABASE_URL environment variable is set correctly")
 
 app = FastAPI(title="FastAPI Auth", description="Authentication API for React project", version="1.0.0")
 
