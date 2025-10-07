@@ -11,6 +11,8 @@ A FastAPI project for user authentication, designed to serve login functionality
 
 ## Setup
 
+### Local Development
+
 1. Install dependencies:
    ```
    pip install -r requirements.txt
@@ -24,6 +26,20 @@ A FastAPI project for user authentication, designed to serve login functionality
    ```
 
 4. The API will be available at `http://localhost:8000`
+
+### Docker Deployment (Dokploy)
+
+1. Build the Docker image:
+   ```
+   docker build -t fastapi-auth .
+   ```
+
+2. Run the container:
+   ```
+   docker run -p 8000:8000 fastapi-auth
+   ```
+
+3. For Dokploy deployment, use the provided `Dockerfile` and `.dockerignore` files.
 
 ## API Endpoints
 
