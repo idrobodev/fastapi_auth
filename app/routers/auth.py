@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
+from pydantic import BaseModel
 from ..models.user import User, UserUpdate, Token, UserRole, UserLogin
 from ..models.database import db, verify_password
 from ..utils.auth import (
@@ -8,7 +9,24 @@ from ..utils.auth import (
 )
 from typing import Dict
 
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    role: str
+
 router = APIRouter()
+
+@router.post("/register")
+async def register(request: RegisterRequest):
+    """Registrar un nuevo usuario"""
+    # Check if user exists
+    existing_user = db.get_user_by_email(request.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    # Create user
+    db.create_user(request.email, request.password, request.role)
+    return {"message": "User registered successfully"}
 
 @router.post("/login")
 async def login(credentials: UserLogin):
