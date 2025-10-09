@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+import yaml
 
 # Cargar variables de entorno
 load_dotenv()
@@ -14,6 +15,11 @@ app = FastAPI(
     description="Backend de autenticación y gestión de usuarios para el dashboard del sistema",
     version="1.0.0"
 )
+
+# Cargar esquema OpenAPI desde archivo YAML
+with open("openapi.yaml", "r") as f:
+    openapi_schema = yaml.safe_load(f)
+app.openapi_schema = openapi_schema
 
 # Configurar CORS
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
