@@ -23,7 +23,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return hashlib.sha256(salt + plain_password.encode()).hexdigest() == hashed_password
 
 # Configuración de la base de datos
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/auth_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Nalufis28++@corporacion-corporaciondb-4z75xa:5432/corporacion_db")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
