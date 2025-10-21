@@ -1,0 +1,439 @@
+openapi: 3.1.0
+info:
+  title: FastAPI Authentication Backend
+  description: "Backend de autenticaci\xF3n y gesti\xF3n de usuarios para el dashboard\
+    \ del sistema"
+  version: 1.0.0
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    RegisterRequest:
+      properties:
+        email:
+          title: Email
+          type: string
+        password:
+          title: Password
+          type: string
+        role:
+          title: Role
+          type: string
+      required:
+      - email
+      - password
+      - role
+      title: RegisterRequest
+      type: object
+    User:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        email:
+          format: email
+          title: Email
+          type: string
+        id:
+          title: Id
+          type: integer
+        role:
+          $ref: '#/components/schemas/UserRole'
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - email
+      - role
+      - id
+      - created_at
+      - updated_at
+      title: User
+      type: object
+    UserCreate:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        password:
+          title: Password
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+      required:
+      - email
+      - role
+      - password
+      title: UserCreate
+      type: object
+    UserLogin:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        password:
+          title: Password
+          type: string
+      required:
+      - email
+      - password
+      title: UserLogin
+      type: object
+    UserRole:
+      enum:
+      - ADMINISTRADOR
+      - CONSULTA
+      title: UserRole
+      type: string
+    UserUpdate:
+      properties:
+        email:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+        password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Password
+        role:
+          anyOf:
+          - $ref: '#/components/schemas/UserRole'
+          - type: 'null'
+      title: UserUpdate
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+  securitySchemes:
+    HTTPBearer:
+      scheme: bearer
+      type: http
+paths:
+  /:
+    get:
+      description: "Endpoint ra\xEDz"
+      operationId: root__get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      summary: Root
+  /api/auth/login:
+    post:
+      description: "Iniciar sesi\xF3n y obtener token de acceso"
+      operationId: login_api_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Login
+      tags:
+      - authentication
+  /api/auth/logout:
+    post:
+      description: "Cerrar sesi\xF3n (simulado - en una implementaci\xF3n real se\
+        \ invalidar\xEDa el token)"
+      operationId: logout_api_auth_logout_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Logout
+      tags:
+      - authentication
+  /api/auth/permission:
+    get:
+      description: Verificar si el usuario tiene el permiso requerido
+      operationId: check_user_permission_api_auth_permission_get
+      parameters:
+      - in: query
+        name: role
+        required: true
+        schema:
+          title: Role
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: boolean
+                title: Response Check User Permission Api Auth Permission Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Check User Permission
+      tags:
+      - authentication
+  /api/auth/profile:
+    put:
+      description: Actualizar perfil del usuario actual
+      operationId: update_profile_api_auth_profile_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Update Profile
+      tags:
+      - authentication
+  /api/auth/register:
+    post:
+      description: Registrar un nuevo usuario
+      operationId: register_api_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Register
+      tags:
+      - authentication
+  /api/auth/reset-password:
+    post:
+      description: "Restablecer contrase\xF1a (simulado - en producci\xF3n enviar\xED\
+        a email)"
+      operationId: reset_password_api_auth_reset_password_post
+      parameters:
+      - in: query
+        name: email
+        required: true
+        schema:
+          title: Email
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Reset Password
+      tags:
+      - authentication
+  /api/dashboard/stats:
+    get:
+      description: "Obtener estad\xEDsticas del dashboard"
+      operationId: get_dashboard_stats_api_dashboard_stats_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Get Dashboard Stats
+      tags:
+      - dashboard
+  /api/usuarios:
+    get:
+      description: Obtener lista de todos los usuarios (solo administradores)
+      operationId: get_usuarios_api_usuarios_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                title: Response Get Usuarios Api Usuarios Get
+                type: array
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Get Usuarios
+      tags:
+      - dashboard
+    post:
+      description: Crear nuevo usuario (solo administradores)
+      operationId: create_usuario_api_usuarios_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Usuario
+      tags:
+      - dashboard
+  /api/usuarios/{user_id}:
+    delete:
+      description: Eliminar usuario (solo administradores)
+      operationId: delete_usuario_api_usuarios__user_id__delete
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Delete Usuario
+      tags:
+      - dashboard
+    put:
+      description: Actualizar usuario existente (solo administradores)
+      operationId: update_usuario_api_usuarios__user_id__put
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Update Usuario
+      tags:
+      - dashboard
+  /health:
+    get:
+      description: Endpoint de health check
+      operationId: health_check_health_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      summary: Health Check
+
