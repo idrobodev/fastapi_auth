@@ -32,8 +32,8 @@ app.add_middleware(
 )
 
 # Incluir routers
-app.include_router(auth.router, prefix="", tags=["authentication"])
-app.include_router(dashboard.router, prefix="", tags=["dashboard"])
+app.include_router(auth.router, prefix="/auth", tags=["authentication"])
+app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 
 @app.get("/health")
 async def health_check():
